@@ -1,1 +1,10 @@
+<!-- Wenn das Observable true hat, dann soll der Spinner gezeigt werden 
+     mit loading$ | async wird das Observable sunscibet und auch
+     nach Benutzung unsubscribet
+-->
+<div class="spinner-container" *ngIf="loadingService.loading$ | async">
+
+    <mat-spinner></mat-spinner>
+
+</div>
 

@@ -4,6 +4,7 @@ import {interval, noop, Observable, of, throwError, timer} from 'rxjs';
 import {catchError, delay, delayWhen, filter, finalize, map, retryWhen, shareReplay, tap} from 'rxjs/operators';
 import {HttpClient} from '@angular/common/http';
 import { CoursesService } from '../services/courses.service';
+import { LoadingService } from '../loading/loading.service';
 
 
 @Component({
@@ -18,6 +19,7 @@ export class HomeComponent implements OnInit {
   advancedCourses$: Observable<Course[]>;
 
   constructor(
+    public loadingService: LoadingService,
     private coursesService: CoursesService,
     private http: HttpClient
   ) {}
@@ -30,9 +32,12 @@ export class HomeComponent implements OnInit {
 
     console.log('reloadCourses', event);
 
+    this.loadingService.loadingOn();
+
     const courses$ = this.coursesService.loadAllCourses()
     .pipe(
-      map(courses => courses.sort(sortCoursesBySeqNo))
+      map(courses => courses.sort(sortCoursesBySeqNo)),
+      finalize(() => this.loadingService.loadingOff())
     )
 
     // courses$.subscribe(val => console.log('val', val));

@@ -1,0 +1,33 @@
+>: git clone https://github.com/angular-university/reactive-angular-course.git
+>: nvm use 18.19.1
+>: git checkout 1-start
+>: npm i
+>: npm run server
+>: Check running server with: localhost:9000/api/courses
+>: npm start Check running the sample app with: localhost:4200
+   The app is written in imparative style and we refactor the app to reactive style
+
+Info zu Proxy:
+>: Das npm start Script startet die App mit einem Proxy!
+   In Home wird als API-Pfad /api/courses angegeben
+   Also sollte die App in der Url für den Pfad
+   http://localhost:4200/api/courses anzeigen!
+   ABER der Proxy verhindert das. Bzw. verschleiert!
+   anzeigt wird NUR http://localhost:4200
+   weil in /proxy.json 
+   {
+    "/api": {
+        "target": "http://localhost:9000",
+        "secure": false
+    }
+   }
+   steht
+
+1. Home und reload reactive machen
+   1.1 oberservable und async in HTML benutzen
+   1.2 
+2. Wiederverwendbare Componenten reactive machen
+   am Beispiel mat-spinner
+   2.1 Die Component in app.html injecten
+   2.2 In allen Kind-Componets die den Spinner nutzen,
+       den spinner-service injecten
