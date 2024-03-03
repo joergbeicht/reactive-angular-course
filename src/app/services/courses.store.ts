@@ -51,8 +51,37 @@ export class CoursesStore {
     }
 
     saveCourse(courseId:string, changes: Partial<Course>):Observable<any> {
+
+        const courses = this.subject.getValue();
+
+        const index = courses.findIndex(course => course.id == courseId);
+
+        //erstellt ein neues Objekt als kopie und schreibt alle änderungen hinein
+        // somit haben wir ein komplett neues Objet mit allen änderugnen
+        const newCourse: Course = {
+            ...courses[index],
+            ...changes
+        };
+
+        // Erstellt eine komplette Kopie des Arrays!
+        const newCourses: Course[] = courses.slice(0);
+
+        //Das neue Array wird jetzt mit dem neuen Objekt updatet!
+        newCourses[index] = newCourse;
+
+        console.log('newCourses', newCourses);
+
+        this.subject.next(newCourses);
+
         return this.http.put(`/api/courses/${courseId}`, changes)
             .pipe(
+                catchError(err => {
+                    const message = 'Could not save courses';
+                    this.messagesService.showErrors(message);
+                    console.log(message, err);
+                    // gibt ein neues Observable zurtück und terminiert das reigesteckt Observable!
+                    return throwError(err);
+                }),
                 shareReplay()
             );
     }
