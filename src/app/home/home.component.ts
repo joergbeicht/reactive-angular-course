@@ -5,6 +5,7 @@ import { catchError, delay, delayWhen, filter, finalize, map, retryWhen, shareRe
 import { HttpClient } from '@angular/common/http';
 import { CoursesService } from '../services/courses.service';
 import { LoadingService } from '../loading/loading.service';
+import { MessagesService } from '../messages/xmessages.service';
 
 
 @Component({
@@ -19,6 +20,7 @@ export class HomeComponent implements OnInit {
   advancedCourses$: Observable<Course[]>;
 
   constructor(
+    private messagesService: MessagesService,
     public loadingService: LoadingService,
     private coursesService: CoursesService,
     private http: HttpClient
@@ -52,7 +54,14 @@ export class HomeComponent implements OnInit {
     // nachher
     const courses$ = this.coursesService.loadAllCourses()
       .pipe(
-        map(courses => courses.sort(sortCoursesBySeqNo))
+        map(courses => courses.sort(sortCoursesBySeqNo)),
+        catchError(err => {
+          const message = 'Could not load courses';
+          this.messagesService.showErrors(message);
+          console.log(message, err);
+          // gibt ein neues Observable zurtück und terminiert das reigesteckt Observable!
+          return throwError(err);
+        })
       )
 
     // showLoaderUntilCompleted<Course[]> bedeutet,

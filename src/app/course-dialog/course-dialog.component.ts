@@ -7,14 +7,21 @@ import { catchError, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { CoursesService } from '../services/courses.service';
 import { LoadingService } from '../loading/loading.service';
+import { MessagesService } from '../messages/xmessages.service';
 
 @Component({
     selector: 'course-dialog',
     templateUrl: './course-dialog.component.html',
     styleUrls: ['./course-dialog.component.css'],
-    // LoadingService muss hier separat injected werden, da CourseDialogComponent
-    // 
-    providers: [LoadingService]
+    // LoadingService und MessagesService erstellen jeweils eine neue Instanz des jeweiligen Service
+    // LoadingService und MessagesService müssen hier separat injected werden, obwohl
+    // beide bereits in app.component instanziiert werden.
+    // Das sit zwar richtig, dass beide bereits in app.component instanziiert werden
+    // aber CourseDialogComponent ist kein Kind aus app.component siehe auch router
+    // on router findest du alle Kinder
+    // CourseDialogComponent ist also auf einer anderen Ebene, daher muss hier 
+    // erneut instnaziiert werden, damit die jeweiligen Servides benutzt werden können
+    providers: [LoadingService, MessagesService]
 })
 export class CourseDialogComponent implements AfterViewInit {
 
@@ -24,6 +31,7 @@ export class CourseDialogComponent implements AfterViewInit {
 
     constructor(
         public loadingService: LoadingService,
+        public messagesService: MessagesService,
         private destroyRef: DestroyRef,
         private coursesStore: CoursesService,
         private fb: FormBuilder,
@@ -48,8 +56,18 @@ export class CourseDialogComponent implements AfterViewInit {
 
         const changes = this.form.value;
 
-        const saveCourse$ = this.coursesStore.saveCourse(this.course.id, changes);
+        const saveCourse$ = this.coursesStore.saveCourse(this.course.id, changes)
+            .pipe(
+                catchError(err => {
+                    const message = 'Could not save course';
+                    console.log(message, err);
+                    this.messagesService.showErrors(message);
+                    return throwError(err);
+                })
+            )
    
+        console.log('saveCourse$', saveCourse$);
+
         this.loadingService.showLoaderUntilCompleted(saveCourse$)    
         .subscribe(val => {
             this.dialogRef.close(val);
