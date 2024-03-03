@@ -62,10 +62,12 @@ export class HomeComponent implements OnInit {
     const loadCourses$ = this.loadingService.showLoaderUntilCompleted<Course[]>(courses$);
 
     this.beginnerCourses$ = loadCourses$.pipe(
+      // map greift in das Array hinein, gibt aber ein Observable zurück
       map(courses => courses.filter(course => course.category == 'BEGINNER'))
     );
 
     this.advancedCourses$ = loadCourses$.pipe(
+      // map greift in das Array hinein, gibt aber ein Observable zurück
       map(courses => courses.filter(course => course.category == 'ADVANCED'))
     );
 

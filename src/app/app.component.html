@@ -51,7 +51,12 @@
 
   </mat-toolbar>
 
-  <!-- Injected die loading Component -->
+  <!-- Injected die loading Component UND alle Componente die in <router-outlet> 
+    stehen erben den Service der in app.components.ts providers: [LoadingService] steht!
+    ACHTUNG: Nicht aber CourseDialogComponent! Diese Component ist sozusagen frei!
+    Damit CourseDialogComponent den LoadingService nutzen kann, muss providers: [LoadingService]
+    separat in course-dialog.component.ts injected werden!
+  -->
   <loading></loading>
 
   <router-outlet></router-outlet>
