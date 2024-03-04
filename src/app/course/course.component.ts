@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {Course} from '../model/course';
 import {
@@ -13,9 +13,15 @@ import {
   withLatestFrom,
   concatAll, shareReplay, catchError
 } from 'rxjs/operators';
-import {merge, fromEvent, Observable, concat, throwError} from 'rxjs';
+import {merge, fromEvent, Observable, concat, throwError, combineLatest} from 'rxjs';
 import {Lesson} from '../model/lesson';
+import {CoursesService} from '../services/courses.service';
 
+
+interface CourseData {
+    course: Course;
+    lessons: Lesson[];
+}
 
 @Component({
   selector: 'course',
@@ -24,31 +30,44 @@ import {Lesson} from '../model/lesson';
 })
 export class CourseComponent implements OnInit {
 
-  course: Course;
+  course$: Observable<Course>;
+  lessons$: Observable<Lesson[]>;
 
-  lessons: Lesson[];
+  data$: Observable<CourseData>;
 
-  constructor(private route: ActivatedRoute) {
+  courseId:number;
 
+  constructor(    
+    private route: ActivatedRoute,
+    private coursesService: CoursesService) {
 
+    // this.courseId = parseInt(this.route.snapshot.paramMap.get("courseId"));
+
+  }  
+  
+
+   ngOnInit() {
+
+    const courseId = parseInt(this.route.snapshot.paramMap.get("courseId"));
+
+    const course$ = this.coursesService.loadCourseById(courseId)
+      .pipe(
+        startWith(null)
+      )
+    const lessons$ = this.coursesService.loadAllCourseLessons(courseId)
+        .pipe(
+          startWith([])
+        )
+
+    this.data$ = combineLatest([course$, lessons$])
+      .pipe(
+        map(([course, lessons]) => {
+          return {
+            course, lessons
+          }
+        }),
+        tap(console.log)
+      )
+    
   }
-
-  ngOnInit() {
-
-
-
-  }
-
-
 }
-
-
-
-
-
-
-
-
-
-
-
