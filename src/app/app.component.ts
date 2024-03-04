@@ -1,8 +1,7 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { LoadingService } from './loading/loading.service';
 import { MessagesService } from './messages/xmessages.service';
-
-
+import { AuthStore } from '../../server/auth.store';
 
 @Component({
   selector: 'app-root',
@@ -12,19 +11,19 @@ import { MessagesService } from './messages/xmessages.service';
   // die von app.component erben. Das sind alle die in app-routing.module.ts stehen
   providers: [LoadingService, MessagesService]
 })
-export class AppComponent implements  OnInit {
+export class AppComponent implements OnInit {
 
-    constructor() {
+  constructor(public authStore: AuthStore) {
 
-    }
+  }
 
-    ngOnInit() {
+  ngOnInit() {
 
 
-    }
+  }
 
   logout() {
-
+    this.authStore.logout();
   }
 
 }
